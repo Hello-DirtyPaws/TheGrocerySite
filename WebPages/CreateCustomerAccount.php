@@ -1,23 +1,15 @@
 <?php
-session_start();
-
-if($_SESSION["role"] != "Admin")
-{
-    header('HTTP/1.0 404 Unauthorized');
-    exit;
-}
-
   if (isset($_POST['submit'])) 
   {
     unset($_POST['submit']);
-    $name = $_POST['name'];
+    $name = trim($_POST['name']);
     $email = strtolower($_POST['email']);
     $phone = $_POST['phone'];
-    $pass = $_POST['password'];
+    $pass = trim($_POST['password']);
     
     if(empty($name) || empty($email) || empty($phone) || empty($pass))
     {
-        include('A_AddManager.php');
+        include('CreateCustomerAccount.php');
         echo "<h3 align='center' style='color:red'>Please fill out all the detalis.</h3>";
         exit;
     }
@@ -38,23 +30,25 @@ if($_SESSION["role"] != "Admin")
           }
           //echo "Connected successfully <br>";
         }
+        
         $pass = sha1($pass);
-        $sql = "INSERT INTO Users (Email, Password, Name, Phone, Role) VALUES ('$email', '$pass', '$name', '$phone', 'Manager')";
+        
+        $sql = "INSERT INTO Users (Email, Password, Name, Phone, Role) VALUES ('$email', '$pass', '$name', '$phone', 'Customer')";
         $result = $conn->query($sql);
         if($result != null && $result)
         {
-            include("./A_AdminManagerPage.php");
-            echo "<h3 align='center' style='color:green'>New Manager added.</h3>";
+            include("./Login.php");
+            echo "<h3 align='center' style='color:green'>New Costumer  created.</h3>";
             exit;
         }
         else
         {
-            include('A_AddManager.php');
             echo "<h3 align='center' style='color:red'>User with that Email already exist. Please, try Again.</h3>";
+            include("./CreateCustomerAccount.php");
             exit;
         }
-      }
     }
+  }
   
 ?>
 
@@ -62,26 +56,23 @@ if($_SESSION["role"] != "Admin")
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<link rel="stylesheet" type="text/css" href="../CSS/stylesheet.css"/>
+		<link rel="stylesheet" type="text/css" href="CSS/stylesheet.css"/>
 		<title>Grocery Store</title>
 	</head>
-	<body class="adminBody">    
-	    
-	    <?php include('AdminNavigationBar.php'); ?>
-	    
+	<body class='bodyDefault'>
 		<h1 align="center">The Grocery Store</h1>
-		<h2 align="center">Add a new Manager Account</h2>
+		<h2 align='center'>Create a new Customer Account</h2>
 		
 		<form method="post" action="">
     		<table class='table'>
     		    <tr>
-    		        <td>Name</td> <td> <input type="text" name="name"> </td>
+    		        <td>Name</td> <td> <input type="text" name="name" required> </td>
     		    </tr>
     		    <tr>
-    		        <td>Email</td> <td> <input type="email" name="email"> </td>
+    		        <td>Email</td> <td> <input type="email" name="email" required> </td>
     		    </tr>
     		    <tr>
-    		        <td>Password</td> <td> <input type="password" name="password"> </td>
+    		        <td>Password</td> <td> <input type="password" name="password" required> </td>
     		    </tr>
     		    <tr>
     		        <td>Phone</td>
@@ -89,7 +80,7 @@ if($_SESSION["role"] != "Admin")
     		    </tr>
     		    <tr>
 			    <td><input type="submit" name="submit" value="create"></td>
-			    <td><input type="button" value="cancel" onclick="window.location.href = './A_AdminManagerPage.php';"> </td>
+			    <td><input type="button" value="cancel" onclick="window.location.href = './Login.php';"> </td>
 			</tr>
     		</table>
 		</form>
